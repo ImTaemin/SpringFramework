@@ -38,4 +38,18 @@
 		SET title=#{title}, content=#{content}, writer=#{writer}, updateDate=sysdate 
 		WHERE bno = #{bno}
 	</update>
+
+	<select id="getListWithPaging" resultType="org.tmkim.domain.BoardVO">
+		<![CDATA[
+			SELECT bno, title, content, writer, regdate, updatedate
+			FROM
+			(
+			    SELECT /*+ INDEX_DESC (tbl_board pk_board) */
+			    	rownum rn, bno, title, content, writer, regdate, updatedate
+			    FROM tbl_board
+			    WHERE rownum <= #{pageNum} * #{amount}
+			)
+			WHERE rn > (#{pageNum} -1) * #{amount}
+		]]>
+	</select>
 </mapper>

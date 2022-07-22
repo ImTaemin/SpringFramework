@@ -9,6 +9,9 @@ import org.tmkim.domain.BoardVO;
 
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.tmkim.domain.Criteria;
+
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("file:src/main/webapp/WEB-INF/spring/root-context.xml")
@@ -66,5 +69,15 @@ public class BoardMapperTests {
 		
 		int count = mapper.update(board);
 		log.info("UPDATE COUNT : " + count );
+	}
+
+	@Test
+	public void testPaging(){
+		Criteria cri = new Criteria();
+		// 10개씩 3페이지
+		cri.setPageNum(2);
+		cri.setAmount(10);
+		List<BoardVO> list = mapper.getListWithPaging(cri);
+		list.forEach(board -> log.info(board.getBno()));
 	}
 }

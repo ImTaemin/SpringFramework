@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.tmkim.domain.BoardVO;
+import org.tmkim.domain.Criteria;
 import org.tmkim.service.BoardService;
 
 @Log4j2
@@ -20,11 +21,18 @@ public class BoardController
 {
     private BoardService service;
 
+//    @GetMapping("/list")
+//    public void list(Model model)
+//    {
+//        log.info("list");
+//        model.addAttribute("list", service.getList());
+//    }
+
     @GetMapping("/list")
-    public void list(Model model)
+    public void list(Criteria cri, Model model)
     {
-        log.info("list");
-        model.addAttribute("list", service.getList());
+        log.info("list" + cri);
+        model.addAttribute("list", service.getList(cri));
     }
 
     @GetMapping("/register")
