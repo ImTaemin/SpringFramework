@@ -189,3 +189,4 @@ logs/file.log
 *.class
 
 *.properties
+.classpath
