@@ -1,5 +1,5 @@
 # SpringBoard
- SpringBoard
+ SpringBoard REST API
  --- 
 |작업명|URL|Method|Parameter|From|URL 이동|
 |:---:|:---:|:---:|:---:|:---:|:---:|
