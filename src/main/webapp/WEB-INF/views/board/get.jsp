@@ -29,7 +29,7 @@
 
 				<div class="form-group">
 					<label>Title</label>
-					<input class="form-control" name="title" readonly="readonly">
+					<input class="form-control" name="title" value="<c:out value='${board.title}'/>" readonly="readonly">
 				</div>
 
 				<div class="form-group">
@@ -47,6 +47,8 @@
 				
 				<form id="operForm" action="/board/modify" method="get">
 					<input type="hidden" id="bno" name="bno" value='<c:out value="${board.bno }"/>'>
+					<input type="hidden" name="pageNum" value='<c:out value="${cri.pageNum }"/>'>
+					<input type="hidden" name="amount" value='<c:out value="${cri.amount }"/>'>
 				</form>
 			</div>
 			<!-- /.panel-body -->
@@ -59,14 +61,15 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		let operFrom = $("#operForm");
+		let operForm = $("#operForm");
 		
 		$("button[data-oper='modify']").on("click", function(e){
-			operFrom.attr("action", "/board/modify").submit();
+            operForm.attr("action", "/board/modify").submit();
 		});
 		
 		$("button[data-oper='list']").on("click", function(e){
-			operForm.find("#bno").remove();
+            e.preventDefault();
+            operForm.find("#bno").remove();
 			operForm.attr("action", "/board/list")
 			operForm.submit();
 		});

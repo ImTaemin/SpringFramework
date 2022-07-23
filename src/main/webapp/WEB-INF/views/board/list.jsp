@@ -144,6 +144,7 @@
             eleBno.setAttribute("name", "bno");
             eleBno.setAttribute("value", "" + $(this).attr("href"));
 
+            actionForm.append(eleBno);
             actionForm.attr("action", "/board/get");
             actionForm.submit();
         });
