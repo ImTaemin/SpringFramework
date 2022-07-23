@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.tmkim.domain.BoardVO;
 import org.tmkim.domain.Criteria;
+import org.tmkim.domain.PageDTO;
 import org.tmkim.service.BoardService;
 
 @Log4j2
@@ -33,6 +34,7 @@ public class BoardController
     {
         log.info("list" + cri);
         model.addAttribute("list", service.getList(cri));
+        model.addAttribute("pageMaker", new PageDTO(cri, 123));
     }
 
     @GetMapping("/register")

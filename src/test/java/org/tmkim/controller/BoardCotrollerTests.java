@@ -80,7 +80,8 @@ public class BoardCotrollerTests
     @Test
     public void testRemove() throws Exception
     {
-        String resultPage = mockMvc.perform(MockMvcRequestBuilders.post("/board/remove")
+        String resultPage = mockMvc.perform(MockMvcRequestBuilders
+                        .post("/board/remove")
                         .param("bno", "10"))
                 .andReturn().getModelAndView().getViewName();
 
