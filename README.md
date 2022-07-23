@@ -2,7 +2,7 @@
  SpringBoard
  --- 
 # SpringMVC - MyBatis의 처리 흐름
-> ![MVC_Flow](MVC_Flow.png)
+> ![MVC_Flow](https://user-images.githubusercontent.com/84948004/180598375-8b3139b2-63cc-42c2-8ff1-b060e18c57ae.png)
 > 1. 웹 브라우저는 URL을 이용하여 요청을 보낸다.
 > 2. Controller는 웹 브라우저의 요청을 처리<br>컨트롤러가 서비스를 호출한다.
 > 3. Service는 비즈니스 로직을 처리한다.<br>데이터 베이스에 접근하는 Mapper를 이용하여 DB의 결과값을 받아온다.
