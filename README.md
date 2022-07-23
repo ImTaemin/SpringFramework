@@ -1,6 +1,14 @@
 # SpringBoard
  SpringBoard
  --- 
+|작업명|URL|Method|Parameter|From|URL 이동|
+|:---:|:---:|:---:|:---:|:---:|:---:|
+|전체 목록|/board/list|GET| | |
+|등록 처리|/board/register|POST|모든 항목|입력화면 필요|이동|
+|조회|/board/get|GET|bno=123| | |
+|삭제 처리|/board/remove|POST|bno|입력화면 필요|이동|
+|수정 처리|/board/modify|POST|모든 항목|입력화면 필요|이동|
+ ---
 # SpringMVC - MyBatis의 처리 흐름
 > ![MVC_Flow](https://user-images.githubusercontent.com/84948004/180598375-8b3139b2-63cc-42c2-8ff1-b060e18c57ae.png)
 > 1. 웹 브라우저는 URL을 이용하여 요청을 보낸다.
