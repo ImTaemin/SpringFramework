@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.tmkim.domain.Criteria;
 import org.tmkim.domain.ReplyPageDTO;
 import org.tmkim.domain.ReplyVO;
+import org.tmkim.service.ReplyService;
 
 @RequestMapping("/replies/")
 @RestController

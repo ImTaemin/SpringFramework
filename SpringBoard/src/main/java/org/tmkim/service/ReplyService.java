@@ -1,4 +1,4 @@
-package org.tmkim.controller;
+package org.tmkim.service;
 
 import org.tmkim.domain.Criteria;
 import org.tmkim.domain.ReplyPageDTO;
