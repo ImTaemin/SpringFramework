@@ -1,9 +1,9 @@
 package org.tmkim.service;
 
-import java.util.List;
-
 import org.tmkim.domain.BoardVO;
 import org.tmkim.domain.Criteria;
+
+import java.util.List;
 
 public interface BoardService {
 

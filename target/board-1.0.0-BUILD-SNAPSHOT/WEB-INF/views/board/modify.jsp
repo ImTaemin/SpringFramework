@@ -1,8 +1,7 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 		 pageEncoding="UTF-8" %>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ include file="../includes/header.jsp" %>
 
 
@@ -25,6 +24,11 @@
 			<div class="panel-body">
 				<form role="form" action="/board/modify" method="post">
 
+					<input type="hidden" name="pageNum" value="<c:out value='${cri.pageNum}'/>">
+					<input type="hidden" name="amount" value="<c:out value='${cri.amount}'/>">
+					<input type="hidden" name="type" value="<c:out value='${cri.type}'/>">
+					<input type="hidden" name="keyword" value="<c:out value='${cri.keyword}'/>">
+
 					<div class="form-group">
 						<label>Bno</label>
 						<input class="form-control" name="bno" value="<c:out value='${board.bno}'/>"
@@ -38,21 +42,18 @@
 
 					<div class="form-group">
 						<label>Test area</label>
-						<textarea class="form-control" rows="3" name="content"><c:out
-								value="${board.content}"/></textarea>
+						<textarea class="form-control" rows="3" name="content"><c:out value="${board.content}"/></textarea>
 					</div>
 
 					<div class="form-group">
 						<label>Writer</label>
-						<input class="form-control" name="writer" value="<c:out value='${board.writer}'/>"
-							   readonly="readonly">
+						<input class="form-control" name="writer" value="<c:out value='${board.writer}'/>" readonly="readonly">
 					</div>
 
 					<div class="form-group">
 						<label>RegDate</label>
 						<input class="form-control" name="regDate"
-							   value="<fmt:formatDate pattern="yyyy/MM/dd" value='${board.regdate}'/>"
-							   readonly="readonly">
+							   value="<fmt:formatDate pattern="yyyy/MM/dd" value='${board.regdate}'/>" readonly="readonly">
 					</div>
 
 					<div class="form-group">
@@ -88,8 +89,18 @@
             if (operation === 'remove') {
                 formObj.attr("action", "/board/remove");
             } else if (operation === 'list') {
-                formObj.attr("action", "/board/list").attr("method","get");
+                formObj.attr("action", "/board/list").attr("method", "get");
+                
+                let pageNumTag = document.querySelector("input[name='pageNum']").cloneNode();
+                let amountTag = document.querySelector("input[name='amount']").cloneNode();
+                let keywordTag = document.querySelector("input[name='keyword']").cloneNode();
+                let typeTag = document.querySelector("input[name='type']").cloneNode();
+
                 formObj.empty();
+                formObj.append(pageNumTag);
+                formObj.append(amountTag);
+                formObj.append(keywordTag);
+                formObj.append(typeTag);
             }
 
             formObj.submit();
