@@ -1,6 +1,5 @@
-# SpringBoard
- SpringBoard REST API
- --- 
+# SpringBoard REST API
+--- 
 |작업명|URL|Method|Parameter|From|URL 이동|
 |:---:|:---:|:---:|:---:|:---:|:---:|
 |전체 목록|/board/list|GET| | |
@@ -16,3 +15,12 @@
 3. Service는 비즈니스 로직을 처리한다.<br>데이터 베이스에 접근하는 Mapper를 이용하여 DB의 결과값을 받아온다.
 4. Mapper는 데이터베이스에 접속하여 비즈니스 로직 실행에 필요한 쿼리를 호출한다
 5. DB에서 알맞은 쿼리를 실행 후 결과값을 반환한다.
+
+# SpringBoard Reply REST API
+|작업|URL|METHOD|
+|---|---|---|
+|등록|/replies/new|POST|
+|조회|/replies/:rno|GET|
+|삭제|/replies/:rno|DELETE|
+|수정|/replies/:rno|PUT or PATCH|
+|페이지|/replies/pages/:bno/:page|GET|
