@@ -12,8 +12,8 @@ tmp/
 local.properties
 .settings/
 .loadpath
-.recommenders
 
+.recommenders
 # External tool builders
 .externalToolBuilders/
 
@@ -190,3 +190,5 @@ logs/file.log
 
 *.properties
 .classpath
+
+SpringBoard/target/
