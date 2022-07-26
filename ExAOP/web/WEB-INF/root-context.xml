@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+<!--    &lt;!&ndash; This tag registers the DefaultAnnotationHandlerMapping and-->
+<!--     AnnotationMethodHandlerAdapter beans that are required for Spring MVC  &ndash;&gt;-->
+<!--    <mvc:annotation-driven />-->
+<!--    -->
+<!--    &lt;!&ndash; This tag allows for mapping the DispatcherServlet to "/" &ndash;&gt;-->
+<!--    <mvc:default-servlet-handler />-->
+
+    <!-- Process annotations on registered beans like @Autowired... -->
+    <context:annotation-config/>
+
+    <!-- 컴포넌트 스캔 -->
+    <context:component-scan base-package="org.tmkim.service" />
+    <context:component-scan base-package="org.tmkim.aop" />
+
+    <aop:aspectj-autoproxy/>
+
+</beans>
