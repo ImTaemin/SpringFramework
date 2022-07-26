@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="org.junit_4.13.0.v20200204-1500">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../sts3-bundle/sts-3.9.18.RELEASE/plugins/org.junit_4.13.0.v20200204-1500.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
