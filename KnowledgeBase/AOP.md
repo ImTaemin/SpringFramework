@@ -9,24 +9,24 @@
 
 # 📗 용어 정리
 > ## 📌 Target
-> - 부가기능을 부여할 대상 (핵심기능을 담고 있는 모듈)
+> - 부가기능을 부여할 대상 (**핵심기능**을 담고 있는 **모듈**)
 > ## ✔ Aspect
 > - Aspect = Advice + PointCut
-> - 부가기능 모듈을 Aspect라고 부른다. (핵심기능에 부가되어 의미를 갖는 모듈)
+> - <font style="color:orange;">부가기능 모듈</font>을 Aspect라고 부른다. (핵심기능에 부가되어 의미를 갖는 모듈)
 > - 어플리케이션의 핵심적인 기능에서, 부가적인 기능을 분리해서 Aspect라는 모듈로 만들어서 설계하고 개발하는 방법
 > ## ✔ Advice
 > - 실질적으로 부가기능을 담은 구현체
-> - Aspect가 무엇을 언제 할지를 정의
+> - Aspect가 <font style="color:orange;">무엇을 언제</font> 할지를 정의
 > - 타겟 오브젝트에 종속되지 않기 때문에, 부가기능에만 집중할 수 있음
 > ## ✔ PointCut
-> - 부가기능이 적용될 대상(Method)을 선정하는 방법   
+> - 부가기능이 적용될 <font style="color:orange;">대상(Method)</font>을 선정하는 방법   
 > - Advice를 적용할 JoinPoint를 선별하는 기능을 정의한 모듈
 > ## ✔ JoinPoint
-> - Advice가 적용될 수 있는 위치   
+> - Advice가 적용될 수 있는 <font style="color:orange;">위치</font>   
 > - Spring에서는 메소드 조인포인트만 제공한다.
 > - 타겟 객체가 구현한 모든 메소드는 조인 포인트가 된다.
 > ## ✔ Proxy
-> - Target을 감싸서 Target의 요청을 대신 받아주는 랩핑 오브젝트.
+> - Target을 감싸서 <font style="color:orange;">Target의 요청을 대신 받아주는 랩핑 오브젝트.</font>
 > - 클라이언트에서 Target을 호출하게되면 타겟이 아닌 타겟을 감싸고 있는 Proxy가 호출되어 타겟메소드 실행 전에 선처리 후처리를 실행한다.
 > ## ✔ Introduction
 > - 타겟 클래스에 코드변경 없이 신규 메소드나 멤버 변수를 추가하는 기능
