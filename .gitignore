@@ -110,6 +110,7 @@ local.properties
 # *.iml
 # *.ipr
 
+
 # CMake
 cmake-build-*/
 
@@ -192,3 +193,5 @@ logs/file.log
 .classpath
 
 SpringBoard/target/
+
+ExAop/.idea/
