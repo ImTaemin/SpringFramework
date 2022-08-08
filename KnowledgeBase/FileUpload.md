@@ -149,7 +149,93 @@ fetch("/uploadAjaxAction",{
 })
 .catch((error) => {alert(error)});
 ```
-### ✔
-### ✔
+## 🖼 브라우저에서 섬네일 처리
+### ✔ \<input type='file'> 초기화
+```javascript
+const cloneObj = document.querySelector(".uploadDiv").cloneNode(true).outerHTML;
+// response.json() 이후
+document.querySelector(".uploadDiv").outerHTML = cloneObj;
+```
+### ✔ 업로드 된 이미지 처리
+섬네일 이미지 보여주기  
+서버
+```java
+// byte[]로 파일의 데이터를 전송할 때 브라우저에 보내주는 MIME 타입이 달라진다.
+// probeContentType()을 이용해 적절한 MIME 타입 데이터를 Http 헤더 메세지에 포함
+HttpHeaders header = new HttpHeaders();
+header.add("Content-Type", Files.probeContentType(file.toPath()));
+result = new ResponseEntity<>(FileCopyUtils.copyToByteArray(file), header, HttpStatus.OK);
+```
+클라이언트
+```javascript
+const fileCallPath = encodeURIComponent(uploadResultArr[i].uploadPath
+							+ "/s_" + uploadResultArr[i].uuid
+							+ "_" + uploadResultArr[i].fileName);
+img.setAttribute("src","/display?fileName=" + fileCallPath);
+```
+## 📁 첨부파일 다운로드, 원본 보여주기
+- 섬네일 이미지 - 원본 파일을 크게 보여줌
+- 일반 파일 - 다운로드
+### ✔ 첨부파일 다운로드
+```java
+// 다운로드 MIME 타입
+@GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+public ResponseEntity<Resource> downloadFile(String fileName)
+{
+    Resource resource = new FileSystemResource("c:\\upload\\" + fileName);
+    String resourceName = resource.getFilename();
+
+    // UUID 제거
+    String resourceOriginalName = resourceName.substring(resourceName.indexOf("_") + 1);
+
+    HttpHeaders headers = new HttpHeaders();
+    // filename과 함께 주면 Body에 오는 값 다운.
+    headers.add("Content-Disposition"
+            , "attachment; filename=" + new String(resourceName.getBytes("UTF-8")
+            , "ISO-8859-1"));
+    return new ResponseEntity<Resource>(resource, headers, HttpStatus.OK);
+}
+```
+```javascript
+const fileCallPath = encodeURIComponent(uploadResultArr[i].uploadPath
+    + "/" + uploadResultArr[i].uuid
+    + "_" + uploadResultArr[i].fileName);
+
+const a = document.createElement("a");
+a.setAttribute("href", "/download?fileName="+fileCallPath);
+```
+### ✔ 원본 이미지 보여주기
+```javascript
+const showImage = (fileCallPath) => {
+    const bigPicture = document.querySelector(".bigPicture");
+    const img = document.createElement("img");
+    img.setAttribute("src", "/display?fileName=" + encodeURI(fileCallPath));
+    bigPicture.append(img);
+    // show
+    img.animate({
+        width: ["0%", "600px"],
+        height: ["0%", "100%"]
+    }, 500);
+
+    // hide
+    bigPictureWrapper.addEventListener("click", (e) => {
+        img.animate({
+            width: "0%",
+            height: "0%"
+        }, 500);
+        setTimeout(() => {
+            bigPictureWrapper.style.display = 'none';
+            bigPicture.innerHTML = "";
+        }, 500);
+    });
+}
+
+const a = document.createElement("a");
+a.setAttribute("href", "javascript:showImage('" + originPath + "')");
+```
+### ✔ 첨부파일 삭제
+- 이미지 파일은 섬네일까지 같이 삭제
+- 파일을 삭제한 후에는 브라우저에서도 섬네일, 파일 아이콘 삭제
+- 비정상적으로 브라우저 종료 시 업로드된 파일 처리
 ### ✔
 ### ✔
