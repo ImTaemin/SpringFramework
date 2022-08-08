@@ -206,21 +206,23 @@
                 }
                 uploadResultUl.append(li);
 
-                const uploadResult = document.querySelector(".uploadResult span");
-                uploadResult.addEventListener("click", (e) =>{
-                    const targetFile = e.target.dataset.file;
-                    const type = e.target.dataset.type;
+                const uploadResult = document.querySelectorAll(".uploadResult span");
+                for(const result of uploadResult)
+                {
+                    result.addEventListener("click", (e) =>{
+						const targetFile = e.target.dataset.file;
+						const type = e.target.dataset.type;
 
-                    fetch("/deleteFile", {
-                        method: "POST",
-                        headers: {"Content-Type" : "application/json;charset=utf-8"},
-                        body: {"fileName": targetFile, "type": type}
-                    })
-					.then((response) => response.json())
-					.then((commits) => {
-                        console.log(commits);
+						let sendData = {fileName: targetFile, type: type};
+
+						fetch("/deleteFile", {
+							method: "POST",
+							headers: {"Content-Type" : "application/json;charset=utf-8"},
+							body: JSON.stringify(sendData)
+						})
+						.then((response) => alert(response));
 					});
-                });
+                }
             }
         }
     });

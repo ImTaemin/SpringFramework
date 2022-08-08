@@ -23,10 +23,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Log4j2
 @Controller
@@ -198,18 +195,18 @@ public class UploadController
 
     @PostMapping(value = "/deleteFile", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<String> deleteFile(String fileName, String type)
+    public ResponseEntity<String> deleteFile(@RequestBody HashMap<String, Object> map)
     {
-        log.info("deleteFile : " + fileName);
+        log.info("deleteFile : " + map.get("fileName"));
         File file;
 
         try
         {
             // 일반 파일 삭제
-            file = new File("c:\\upload\\" + URLDecoder.decode(fileName, "UTF-8"));
+            file = new File("c:\\upload\\" + URLDecoder.decode((String) map.get("fileName"), "UTF-8"));
             file.delete();
 
-            if (type.equals("image"))
+            if (map.get("type").equals("image"))
             {
                 // 원본 이미지 파일 삭제
                 String largeFileName = file.getAbsolutePath().replace("s_", "");
