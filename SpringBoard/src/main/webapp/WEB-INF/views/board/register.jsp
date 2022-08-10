@@ -82,19 +82,35 @@
 			e.preventDefault();
             console.log("submit clicked");
 
-            let str = "";
             const lis = document.querySelectorAll(".uploadResult ul li");
-
             for(let i=0; i<lis.length; i++){
                 console.dir(lis[i]);
 
-                str += "<input type='hidden' name='attachList[" + i + "].fileName' value='" + lis[i].dataset.filename + "'>";
-                str += "<input type='hidden' name='attachList[" + i + "].uuid' value='" + lis[i].dataset.uuid + "'>";
-                str += "<input type='hidden' name='attachList[" + i + "].uploadPath' value='" + lis[i].dataset.path + "'>";
-                str += "<input type='hidden' name='attachList[" + i + "].fileType' value='" + lis[i].dataset.type + "'>";
-			}
+                const hiddenFileName = document.createElement("input");
+                hiddenFileName.setAttribute("type", "hidden");
+                hiddenFileName.setAttribute("name", "attachList[" + i +"].fileName");
+                hiddenFileName.setAttribute("value", lis[i].dataset.filename);
 
-            formObj.innerHTML = str;
+                const hiddenUuid = document.createElement("input");
+                hiddenUuid.setAttribute("type", "hidden");
+                hiddenUuid.setAttribute("name", "attachList[" + i +"].uuid");
+                hiddenUuid.setAttribute("value", lis[i].dataset.uuid);
+
+                const hiddenUploadPath = document.createElement("input");
+                hiddenUploadPath.setAttribute("type", "hidden");
+                hiddenUploadPath.setAttribute("name", "attachList[" + i +"].uploadPath");
+                hiddenUploadPath.setAttribute("value", lis[i].dataset.path);
+
+                const hiddenFileType = document.createElement("input");
+                hiddenFileType.setAttribute("type", "hidden");
+                hiddenFileType.setAttribute("name", "attachList[" + i +"].fileType");
+                hiddenFileType.setAttribute("value", lis[i].dataset.type);
+
+                formObj.append(hiddenFileName);
+                formObj.append(hiddenUuid);
+                formObj.append(hiddenUploadPath);
+                formObj.append(hiddenFileType);
+			}
             formObj.submit();
 		});
 

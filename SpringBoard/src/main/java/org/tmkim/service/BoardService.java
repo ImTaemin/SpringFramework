@@ -1,5 +1,6 @@
 package org.tmkim.service;
 
+import org.tmkim.domain.BoardAttachVO;
 import org.tmkim.domain.BoardVO;
 import org.tmkim.domain.Criteria;
 
@@ -14,4 +15,5 @@ public interface BoardService {
 //	public List<BoardVO> getList();
 	public List<BoardVO> getList(Criteria cri);
 	public int getTotal(Criteria cri);
+	public List<BoardAttachVO> getAttachList(Long bno);
 }

@@ -66,6 +66,27 @@
 </div>
 <!-- /.row -->
 
+<div class="bigPictureWrapper">
+	<div class="bigPicture">
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Files
+			</div>
+			<div class="uploadResult">
+				<ul>
+
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
 <div class="row">
 	<div class="col-lg-12">
 		<div class="panel panel-default">
@@ -133,8 +154,107 @@
 	<!-- /.modal-dialog -->
 </div>
 
+<script type="text/javascript" src="/resources/js/reply.js"></script>
+
 <script type="text/javascript">
+    const showImage = (fileCallPath) => {
+        const bigPictureWrapper = document.querySelector(".bigPictureWrapper");
+        bigPictureWrapper.style.display = 'flex';
+
+        // 이미지 로드 후 애니메이션 처리
+        const bigPicture = document.querySelector(".bigPicture");
+        const img = document.createElement("img");
+        img.setAttribute("src", "/display?fileName=" + fileCallPath);
+        bigPicture.append(img);
+        img.animate({
+            width: ["0%", "600px"],
+            height: ["0%", "100%"]
+        }, 500);
+
+        // 사진 창 닫기
+        bigPictureWrapper.addEventListener("click", (e) => {
+            img.animate({
+                width: "0%",
+                height: "0%"
+            }, 500);
+            setTimeout(() => {
+                bigPictureWrapper.style.display = 'none';
+                bigPicture.innerHTML = "";
+            }, 500);
+        });
+    };
+
     document.addEventListener("DOMContentLoaded", function (e) {
+        // 첨부파일 조회
+		(function (){
+			const bno = '<c:out value="${board.bno}"/>';
+			fetch("/board/getAttachList?bno="+bno)
+			.then((response) => response.json())
+			.then((result) => {
+
+                console.log(result);
+
+                let str = "";
+
+                for(let i=0; i<result.length; i++){
+                    const li = document.createElement("li");
+					li.setAttribute("data-path", result[i].uploadPath);
+					li.setAttribute("data-uuid", result[i].uuid);
+					li.setAttribute("data-filename", result[i].fileName);
+					li.setAttribute("data-type", result[i].fileType);
+
+					// 이미지 타입
+					if(result[i].fileType) {
+                        const fileCallPath = encodeURIComponent(result[i].uploadPath
+                            + "/s_" + result[i].uuid
+                            + "_" + result[i].fileName);
+
+                        const img = document.createElement("img");
+                        img.setAttribute("src", "/display?fileName="+fileCallPath);
+
+                        const div = document.createElement("div");
+                        div.append(img);
+
+                        li.append(div);
+					} else {
+                        const span = document.createElement("span");
+                        span.append(result[i].fileName);
+                        span.append(document.createElement("br"));
+
+                        const img = document.createElement("img");
+                        img.setAttribute("src", "/resources/img/folder.png");
+
+                        const div = document.createElement("div");
+                        div.append(span);
+                        div.append(img);
+
+                        li.append(div);
+					}
+
+                    document.querySelector(".uploadResult ul").append(li);
+
+                    const uploadResult = document.querySelectorAll(".uploadResult li");
+                    for(const result of uploadResult)
+                    {
+                        result.addEventListener("click", (e) =>{
+                            console.log("view image");
+
+                            const data = e.target.closest("li").dataset;
+                            const path = encodeURIComponent(data.path
+								+ "/" + data.uuid
+								+ "_" + data.filename);
+
+                            if(data.type){
+                                showImage(path.replace(new RegExp(/\\/g), "/"));
+                            } else {
+                                self.location = "/download?fileName=" + path;
+                            }
+                        });
+                    }
+				}
+            });
+		})();
+
         const operForm = $("#operForm");
 
         $("button[data-oper='modify']").on("click", function (e) {
@@ -188,8 +308,6 @@
 
             str += "</ul></div>";
 
-            console.log(str);
-
             replyPageFooter.innerHTML = str;
         }
 
@@ -197,10 +315,8 @@
 		replyPageFooter.addEventListener("click", function(e){
 			if(e.target.parentNode.tagName == "LI" && e.target.tagName == "A"){
                 e.preventDefault();
-                console.log("page click");
 
                 let targetPageNum = e.target.getAttribute("href");
-                console.log(`targetPageNum : ` + targetPageNum);
 
                 showList(targetPageNum);
 			}
@@ -211,13 +327,8 @@
         let replyUL = document.querySelector(".chat");
 
         const showList = (page) => {
-            console.log("show list " + page);
 
             replyService.getList({bno: bnoValue, page: page || 1}, (replyCnt, list) => {
-
-                console.log(`replyCnt : ` + replyCnt);
-                console.log(`list : ` + list);
-                console.log(list);
 
                 /*
 				* 사용자가 새로운 댓글을 추가하면 showList(-1)을 호출해 전체 댓글의 숫자를 파악한다.
@@ -283,7 +394,6 @@
                 bno: bnoValue
             }
             replyService.add(reply, (result) => {
-                alert(result);
                 modal.querySelector("input[name='reply']").value = "";
                 modal.querySelector("input[name='replyer']").value = "";
 
@@ -296,7 +406,6 @@
             const target = e.target.closest("li");
             if (target.tagName == "LI") {
                 const rno = target.dataset.rno;
-                console.log(rno);
             }
         });
 
@@ -326,7 +435,6 @@
         modalModBtn.addEventListener("click", function (e) {
             const reply = {rno: modal.dataset.rno, reply: modalInputReply.value};
             replyService.update(reply, (result) => {
-                alert(result);
                 $(".modal").modal("hide");
                 showList(replyPageNum);
             });
@@ -336,15 +444,11 @@
         modalRemoveBtn.addEventListener("click", function (e) {
             const rno = modal.dataset.rno;
             replyService.remove(rno, (result) => {
-                alert(result);
                 $(".modal").modal("hide");
                 showList(replyPageNum);
             });
         });
     });
-
-    console.log("===========");
-    console.log("JS Test");
 
     const bnoValue = "<c:out value='${board.bno}'/>";
     const replyUL = document.querySelector(".chat");
@@ -353,20 +457,17 @@
     replyService.add(
         {reply: "JS Test", replyer: "tester", bno: bnoValue},
         (result) => {
-            alert(`RESULT : result`);
+            alert("RESULT : " + result);
         });
 
     // 댓글 목록 조회
     replyService.getList({bno: bnoValue, page: 1}, (list) => {
         for (let i = 0, len = list.length || 0; i < len; i++) {
-            // console.log(JSON.stringify(list[i]));
         }
     });
 
     // 댓글 삭제
     replyService.remove(46, (count) => {
-            console.log(count);
-
             if (count === "success") {
                 alert("REMOVED");
             }
@@ -382,10 +483,7 @@
 
     // 댓글 조회
     replyService.get(47, (data) => {
-        console.log(data);
     });
 </script>
-
-<script type="text/javascript" src="/resources/js/reply.js"></script>
 
 <%@ include file="../includes/footer.jsp" %>

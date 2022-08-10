@@ -1,12 +1,8 @@
-console.log("Reply Module...");
-
 // 댓글 모듈
 const replyService = (() => {
 
     // 댓글 작성
     const add = (reply, callback, error) => {
-        console.log("add reply...");
-
         const xhrWrite = new XMLHttpRequest();
         xhrWrite.open("POST", "/replies/new", true);
         xhrWrite.setRequestHeader('content-type', 'application/json; charset=utf-8');
@@ -56,7 +52,6 @@ const replyService = (() => {
     // 댓글 수정
     const update = (reply, callback, error) => {
         const rno = reply.rno;
-        console.log("RNO : " + rno);
 
         const xhrUpdate = new XMLHttpRequest();
         xhrUpdate.open("PUT", `/replies/${rno}`, true);
