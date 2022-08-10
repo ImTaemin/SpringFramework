@@ -15,6 +15,10 @@ import org.tmkim.domain.Criteria;
 import org.tmkim.domain.PageDTO;
 import org.tmkim.service.BoardService;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Log4j2
@@ -96,10 +100,16 @@ public class BoardController
     @PostMapping("/remove")
     public String remove(@RequestParam("bno") Long bno, @ModelAttribute("cri") Criteria cri, RedirectAttributes rttr)
     {
+        /*
+        이미지 파일은 섬네일이 생성되어 있으므로 처리 순서
+        첨부파일 정보 미리 준비 -> DB 게시물, 첨부파일 삭제 -> 첨부파일 목록 이용해 파일 삭제
+         */
         log.info("remove...... " + bno);
+        List<BoardAttachVO> attachList = service.getAttachList(bno);
 
         if (service.remove(bno))
         {
+            deleteFiles(attachList);
             rttr.addFlashAttribute("result", "success");
         }
 
@@ -117,5 +127,36 @@ public class BoardController
     {
         log.info("getAttachList " + bno);
         return new ResponseEntity<>(service.getAttachList(bno), HttpStatus.OK);
+    }
+
+    private void deleteFiles(List<BoardAttachVO> attachList)
+    {
+        if(attachList == null || attachList.size() == 0)
+        {
+            return;
+        }
+
+        log.info("delete attach files..............");
+        log.info(attachList);
+
+        attachList.forEach(attach -> {
+            try
+            {
+                Path file = Paths.get("c:\\upload\\" + attach.getUploadPath()
+                        + "\\" + attach.getUuid() + "_" + attach.getFileName());
+                Files.deleteIfExists(file);
+
+                if(Files.probeContentType(file).startsWith("image"))
+                {
+                    Path thumbNail = Paths.get("c:\\upload\\" + attach.getUploadPath()
+                            + "\\s_" + attach.getUuid() + "_" + attach.getFileName());
+                    Files.delete(thumbNail);
+                }
+            }
+            catch (Exception e)
+            {
+                log.info("delete file error : " + e.getMessage());
+            }
+        });
     }
 }

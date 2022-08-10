@@ -41,6 +41,5 @@ public class Criteria
                 .queryParam("keyword", this.getKeyword());
 
         return builder.toUriString();
-
     }
 }

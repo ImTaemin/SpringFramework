@@ -32,6 +32,10 @@
 	<delete id="delete">
 		DELETE FROM tbl_board WHERE bno = #{bno}
 	</delete>
+
+	<delete id="deleteReply">
+		DELETE FROM tbl_reply WHERE bno = #{bno}
+	</delete>
 	
 	<update id="update">
 		UPDATE tbl_board 
