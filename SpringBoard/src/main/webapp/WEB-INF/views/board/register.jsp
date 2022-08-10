@@ -60,7 +60,7 @@
 
 			<!-- /.panel-heading -->
 			<div class="panel-body">
-				<div class=""form-group uploadDiv>
+				<div class="form-group uploadDiv">
 					<input type="file" name="uploadFile" multiple>
 				</div>
 
