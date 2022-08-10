@@ -191,11 +191,6 @@
 			fetch("/board/getAttachList?bno="+bno)
 			.then((response) => response.json())
 			.then((result) => {
-
-                console.log(result);
-
-                let str = "";
-
                 for(let i=0; i<result.length; i++){
                     const li = document.createElement("li");
 					li.setAttribute("data-path", result[i].uploadPath);
@@ -232,26 +227,24 @@
 					}
 
                     document.querySelector(".uploadResult ul").append(li);
-
-                    const uploadResult = document.querySelectorAll(".uploadResult li");
-                    for(const result of uploadResult)
-                    {
-                        result.addEventListener("click", (e) =>{
-                            console.log("view image");
-
-                            const data = e.target.closest("li").dataset;
-                            const path = encodeURIComponent(data.path
-								+ "/" + data.uuid
-								+ "_" + data.filename);
-
-                            if(data.type){
-                                showImage(path.replace(new RegExp(/\\/g), "/"));
-                            } else {
-                                self.location = "/download?fileName=" + path;
-                            }
-                        });
-                    }
 				}
+
+                const uploadResult = document.querySelectorAll(".uploadResult li");
+                for(const result of uploadResult)
+                {
+                    result.addEventListener("click", (e) =>{
+                        const data = e.target.closest("li").dataset;
+                        const path = encodeURIComponent(data.path
+                            + "/" + data.uuid
+                            + "_" + data.filename);
+
+                        if(data.type === "true"){
+                            showImage(path.replace(new RegExp(/\\/g), "/"));
+                        } else {
+                            self.location = "/download?fileName=" + path;
+                        }
+                    });
+                }
             });
 		})();
 
@@ -365,7 +358,6 @@
 
         showList(1);
 
-
         // 모달
         const modal = document.querySelector(".modal");
         const modalInputReply = modal.querySelector("input[name='reply']");
@@ -457,7 +449,7 @@
     replyService.add(
         {reply: "JS Test", replyer: "tester", bno: bnoValue},
         (result) => {
-            alert("RESULT : " + result);
+            // alert("RESULT : " + result);
         });
 
     // 댓글 목록 조회
@@ -473,7 +465,7 @@
             }
         },
         (err) => {
-            alert("ERROR");
+            // alert("ERROR");
         });
 
     // 댓글 수정
