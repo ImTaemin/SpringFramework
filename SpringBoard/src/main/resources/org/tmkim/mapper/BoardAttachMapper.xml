@@ -20,4 +20,8 @@
 	<delete id="deleteAll">
 		DELETE tbl_attach WHERE bno=#{bno}
 	</delete>
+
+	<select id="getOldFiles" resultType="org.tmkim.domain.BoardAttachVO">
+		SELECT * FROM tbl_attach WHERE uploadpath=to_char(sysdate-1, 'yyyy/mm/dd')
+	</select>
 </mapper>
