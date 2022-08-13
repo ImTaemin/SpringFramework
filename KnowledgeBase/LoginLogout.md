@@ -116,7 +116,7 @@ public void loginInput(String error, String logout, Model model)
         model.addAttribute("logout", "Logout!!");
 }
 ```
-```jsp
+```html
 <!--실제 로그인의 처리 작업은 /login을 통해 이뤄짐(구현x)-->
 <form method="post" action="/login">
     <div>
@@ -151,18 +151,18 @@ public void loginInput(String error, String logout, Model model)
 >```
 > A 사이트의 관리자는 자신이 평상시 방문하던 B 사이트를 방문하게 되고 공격자가 작성한 게시물을 보게 된다.
 > 이때 `<img>` 태그 등에 사용된 URI가 호출되고 서버에서는 로그인한 관리자의 요청에 의해서 공격자는 admin 등급의 사용자로 변경된다.   
->![CSRFAttack](CSRFAttack.png)
+>![CSRFAttack](CSRFAttack.png)   
 > A 사이트의 관리자는 자신이 관리하던 A 사이트에 로그인이 되어 있는 상태라면 A 사이트의 서버 입장에서는 로그인한 사용자의 정상적인 요청으로 해석된다.   
 > CSRF 공격은 서버에서 받아들이는 요청을 해석하고 처리할 때 어떤 출처에서 호출이 진행되었는지 따지지 않기 때문에 생기는 허점을 노리는 공격 방식이다.   
 
-CSRF 공격을 막는 방법
+🛡 CSRF 공격을 막는 방법
 - 사용자의 요청에 대한 출처를 의미하는 refer 헤더를 체크
 - 일반적인 경우에 잘 사용되지 안호 REST 방식에서 사용되는 PUT, DELETE와 같은 방식을 이용
 
 ### 📀 CSRF 토큰
 사용자가 임의로 변하는 특정한 **토큰값**을 서버에서 체크하는 방식   
 서버에서 생성하는 **토큰**은 일반적으로 난수를 생성해서 공격자가 패턴을 찾을 수 없도록 한다.
-1. 서버에는 브라우저에 데이터를 전소할 때 CSRF 토큰을 같이 전송
+1. 서버에는 브라우저에 데이터를 전송할 때 CSRF 토큰을 같이 전송
 2. 사용자가 POST 방식 등으로 특정한 작업을 할 때는 브라우저에서 전송된 CSRF 토큰의 값과 서버가 보관하고 있는 토큰의 값을 비교
 3. 만일 CSRF 토큰의 값이 다르다면 작업을 처리하지 않는 방식
 
@@ -176,7 +176,7 @@ CSRF 공격을 막는 방법
 
 ## 🔒 로그인 성공과 AuthenticationSuccessHandler
 로그인 성공 후 특정 동작을 하도록 제어하고 싶은 경우가 있다.   
-##### ex) 만일 로그인할 때 'id:admin/pw:admin'으로 로그인 했다면, 무조건 'sample/admin'으로 이동하게 하거나, 별도의 쿠키 등을 생성해서 처리하고 싶은 경우
+ex) 로그인할 때 'id:admin/pw:admin'으로 로그인 했다면, 무조건 'sample/admin'으로 이동하게 하거나, 별도의 쿠키 등을 생성해서 처리하고 싶은 경우   
 스프릥 시큐리티에서는 `AuthenticationSuccessHandler`라는 인터페이스를 구현해서 설정 가능
 
 ```java
@@ -227,7 +227,8 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler
 @GetMapping("/customLogout")
 public void logoutGET(){ }
 ```
-```jsp
+```html
+<!--customLogout.jsp-->
 <h1>Logout Page</h1>
 
 <form method="post" action="/customLogout">
