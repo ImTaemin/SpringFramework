@@ -81,6 +81,8 @@ JSP에서는 `HttpRequest` 안에 `SPRING_SECURITY_403_EXCEPTION`이라는 이�
 
 ```xml
 <!--security-context.xml-->
+<bean id="customAccessDenied" class="org.tmkim.security.CustomAccessDeniedHandler" />
+
 <!--<security:access-denied-handler error-page="/accessError" />-->
 <security:access-denied-handler ref="customAccessDenied" />
 ```
@@ -148,6 +150,91 @@ public void loginInput(String error, String logout, Model model)
 ><img src="www.aaa.xxx/update?grade=admin&account=123">
 >```
 > A 사이트의 관리자는 자신이 평상시 방문하던 B 사이트를 방문하게 되고 공격자가 작성한 게시물을 보게 된다.
-> 이때 `<img>` 태그 등에 사용된 URI가 호출되고 서버에서는 로그인한 관리자의 요청에 의해서 공격자는 admin 등급의 사용자로 변경된다.
->
->
+> 이때 `<img>` 태그 등에 사용된 URI가 호출되고 서버에서는 로그인한 관리자의 요청에 의해서 공격자는 admin 등급의 사용자로 변경된다.   
+>![CSRFAttack](CSRFAttack.png)
+> A 사이트의 관리자는 자신이 관리하던 A 사이트에 로그인이 되어 있는 상태라면 A 사이트의 서버 입장에서는 로그인한 사용자의 정상적인 요청으로 해석된다.   
+> CSRF 공격은 서버에서 받아들이는 요청을 해석하고 처리할 때 어떤 출처에서 호출이 진행되었는지 따지지 않기 때문에 생기는 허점을 노리는 공격 방식이다.   
+
+CSRF 공격을 막는 방법
+- 사용자의 요청에 대한 출처를 의미하는 refer 헤더를 체크
+- 일반적인 경우에 잘 사용되지 안호 REST 방식에서 사용되는 PUT, DELETE와 같은 방식을 이용
+
+### 📀 CSRF 토큰
+사용자가 임의로 변하는 특정한 **토큰값**을 서버에서 체크하는 방식   
+서버에서 생성하는 **토큰**은 일반적으로 난수를 생성해서 공격자가 패턴을 찾을 수 없도록 한다.
+1. 서버에는 브라우저에 데이터를 전소할 때 CSRF 토큰을 같이 전송
+2. 사용자가 POST 방식 등으로 특정한 작업을 할 때는 브라우저에서 전송된 CSRF 토큰의 값과 서버가 보관하고 있는 토큰의 값을 비교
+3. 만일 CSRF 토큰의 값이 다르다면 작업을 처리하지 않는 방식
+
+*공격자의 입장에서는 CSRF 공격을 하려면 변경되는 CSRF 토큰의 값을 알아야만 하기 때문에 고정된 내용의 `<form>`태그나 `<img>`태그 등을 이용할 수 없게 된다.*
+
+### ✔ 스프링 시큐리티의 CSRF 설정
+일반적으로 CSRF 토큰은 세션을 통해서 보관하고, 브라우저에서 전송된 CSRF 토큰값을 검사하는 방식으로 처리한다.   
+```xml
+<security:csrf disabled="true" />
+```
+
+## 🔒 로그인 성공과 AuthenticationSuccessHandler
+로그인 성공 후 특정 동작을 하도록 제어하고 싶은 경우가 있다.   
+##### ex) 만일 로그인할 때 'id:admin/pw:admin'으로 로그인 했다면, 무조건 'sample/admin'으로 이동하게 하거나, 별도의 쿠키 등을 생성해서 처리하고 싶은 경우
+스프릥 시큐리티에서는 `AuthenticationSuccessHandler`라는 인터페이스를 구현해서 설정 가능
+
+```java
+//CustomLoginSuccessHandler
+@Log4j2
+public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler
+{
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication auth) throws IOException, ServletException
+    {
+        // 사용자가 가진 모든 권한 추가
+        List<String> roleNames = new ArrayList<>();
+        auth.getAuthorities().forEach(authority ->{
+            roleNames.add(authority.getAuthority());
+        });
+
+        if(roleNames.contains("ROLE_ADMIN"))
+        {
+            response.sendRedirect("/sample/admin");
+            return;
+        }
+
+        if(roleNames.contains("ROLE_MEMBER"))
+        {
+            response.sendRedirect("/sample/member");
+            return;
+        }
+    }
+}
+```
+
+```xml
+<!--security-context.xml-->
+<!--로그인 성공 후 처리를 담당하는 핸들러 지정-->
+<bean id="customLoginSuccess" class="org.tmkim.security.CustomLoginSuccessHandler" />
+
+<!--<security:http> 내부에 추가-->
+<security:form-login login-page="/customLogin" authentication-success-handler-ref="customLoginSuccess"/>
+```
+
+## 🔓 로그아웃 처리와 LogoutSuccesshandler
+로그인과 마찬가지로 특정한 URI 지정하고, 로그아웃 처리 후 직접 로직을 처리할 수 있는 핸들러를 등록할 수 있다.
+```xml
+<security:logout logout-url="/customLogout" invalidate-session="true"/>
+```
+```java
+// CommonController
+@GetMapping("/customLogout")
+public void logoutGET(){ }
+```
+```jsp
+<h1>Logout Page</h1>
+
+<form method="post" action="/customLogout">
+    <!--POST 방식으로 처리되기 때문에 CSRF 토큰값을 같이 지정-->
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <button>로그아웃</button>
+</form>
+```
+POST 방식으로 처리되는 로그아웃은 스프링 시큐리티의 내부에서 동작한다.   
+로그아웃 시 추가적인 작업을 해야 한다면 `LogoutSuccessHandler`를 정의해서 처리한다.

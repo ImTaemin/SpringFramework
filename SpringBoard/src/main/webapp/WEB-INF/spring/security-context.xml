@@ -4,15 +4,20 @@
        xmlns:security="http://www.springframework.org/schema/security"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
+    <bean id="customAccessDenied" class="org.tmkim.security.CustomAccessDeniedHandler" />
+    <bean id="customLoginSuccess" class="org.tmkim.security.CustomLoginSuccessHandler" />
+
     <security:http>
         <security:intercept-url pattern="/sample/all" access="permitAll"/>
         <security:intercept-url pattern="/sample/member" access="hasRole('ROLE_MEMBER')"/>
         <security:intercept-url pattern="/sample/admin" access="hasRole('ROLE_ADMIN')"/>
 
 <!--        <security:form-login/>-->
-        <security:form-login login-page="/customLogin"/>
+        <security:form-login login-page="/customLogin" authentication-success-handler-ref="customLoginSuccess"/>
 
-        <security:access-denied-handler error-page="/accessError" />
+        <security:access-denied-handler ref="customAccessDenied" />
+
+        <security:logout logout-url="/customLogout" invalidate-session="true"/>
     </security:http>
 
     <security:authentication-manager>
