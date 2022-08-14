@@ -2,6 +2,7 @@
 		 pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <%@ include file="../includes/header.jsp" %>
 
@@ -23,6 +24,7 @@
 			<!-- /.panel-heading -->
 			<div class="panel-body">
 				<form role="form" action="/board/register" method="post">
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 					<div class="form-group">
 						<label>title</label>
 						<input class="form-control" name="title">
@@ -35,7 +37,7 @@
 
 					<div class="form-group">
 						<label>Writer</label>
-						<input class="form-control" name="writer">
+						<input class="form-control" name="writer" value="<sec:authentication property='principal.username'/>" readonly="readonly">
 					</div>
 
 					<button type="submit" class="btn btn-default">Submit Button</button>
@@ -186,15 +188,32 @@
 
                         let sendData = {fileName: targetFile, type: type};
 
-                        fetch("/deleteFile", {
-                            method: "POST",
-                            headers: {"Content-Type": "application/json;charset=utf-8"},
-                            body: JSON.stringify(sendData)
-                        })
-                            .then((response) => {
-                                alert(response);
+                        const csrfHeaderName = "${_csrf.headerName}";
+                        const csrfTokenValue = "${_csrf.token}";
+
+                        $.ajax({
+                            url: "/deleteFile",
+                            beforeSend: function (xhr){
+                                xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
+                            },
+                            data: sendData,
+                            type: 'POST',
+                            dataType: 'text',
+                            success: function (result){
+                                console.log(result);
                                 targetLi.remove();
-                            });
+                            }
+                        });
+
+                        // fetch("/deleteFile", {
+                        //     method: "POST",
+                        //     headers: {"Content-Type": "application/json;charset=utf-8"},
+                        //     body: JSON.stringify(sendData)
+                        // })
+						// .then((response) => {
+						// 	alert(response);
+						// 	targetLi.remove();
+						// });
                     });
                 }
             }
@@ -202,6 +221,9 @@
 
         const fileChange = document.querySelector("input[type='file']");
         fileChange.addEventListener("change", (e) => {
+            const csrfHeaderName = "${_csrf.headerName}";
+            const csrfTokenValue = "${_csrf.token}";
+
 			const formData = new FormData();
 
             const inputFile = document.querySelector("input[name='uploadFile']");
@@ -215,18 +237,34 @@
                 formData.append("uploadFile", files[i]);
             }
 
-            fetch("/uploadAjaxAction", {
-                method: "POST",
-                body: formData
-            })
-			.then((response) => response.json())
-			.then(commits => {
-				console.log(commits);
-				showUploadResult(commits);
-			})
-			.catch((error) => {
-				alert(error)
+            $.ajax({
+				url: "/uploadAjaxAction",
+				processData: false,
+				contentType: false,
+				beforeSend: function (xhr){
+                    xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
+				},
+				data: formData,
+				type: 'POST',
+				dataType: 'json',
+				success: function (result){
+                    console.log(result);
+                    showUploadResult(result);
+				}
 			});
+
+            // requestFetch("/uploadAjaxAction", {
+            //     method: "POST",
+            //     body: formData
+            // })
+			// .then((response) => response.json())
+			// .then(commits => {
+			// 	console.log(commits);
+			// 	showUploadResult(commits);
+			// })
+			// .catch((error) => {
+			// 	alert(error)
+			// });
 		});
     });
 </script>

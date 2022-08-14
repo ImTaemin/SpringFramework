@@ -2,6 +2,7 @@
 		 pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <%@ include file="../includes/header.jsp" %>
 
@@ -94,9 +95,12 @@
 
 			<div class="panel-heading">
 				<i class="fa fa-comments fa-fw"></i> Reply
-				<button id="addReplyBtn" class="btn btn-primary btn-xs pull-right" data-toggle="modal"
-						data-target="#myModal"> New Reply
-				</button>
+				<!--로그인 한 사용자만 댓글을 추가할 수 있다.-->
+				<sec:authorize access="isAuthenticated()">
+					<button id="addReplyBtn" class="btn btn-primary btn-xs pull-right" data-toggle="modal"
+							data-target="#myModal"> New Reply
+					</button>
+				</sec:authorize>
 			</div>
 
 			<div class="panel-body">
@@ -144,7 +148,13 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button id="modalModBtn" type="button" class="btn btn-warning">Modify</button>
+				<!--로그인 된 사용자만 보여줌-->
+				<sec:authentication property="principal" var="pinfo"/>
+				<sec:authorize access="isAuthenticated()">
+					<c:if test="${pinfo.username eq board.writer}">
+						<button id="modalModBtn" type="button" class="btn btn-warning">Modify</button>
+					</c:if>
+				</sec:authorize>
 				<button id="modalRemoveBtn" type="button" class="btn btn-danger">Remove</button>
 				<button id="modalRegisterBtn" type="button" class="btn btn-info" data-dismiss="modal">Regist</button>
 				<button id="modalCloseBtn" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -367,34 +377,32 @@
 
         const modalModBtn = document.querySelector("#modalModBtn");
         const modalRemoveBtn = document.querySelector("#modalRemoveBtn");
-
         const addReplyBtn = document.querySelector("#addReplyBtn");
+
+        let replyer = null;
+        <sec:authorize access="isAuthenticated()">
+        	replyer = '<sec:authentication property="principal.username"/>';
+		</sec:authorize>
+
+        const csrfHeaderName = "${_csrf.headerName}";
+        const csrfTokenValue = "${_csrf.token}";
+
         addReplyBtn.addEventListener("click", function (e) {
             for (let i of modal.querySelectorAll("input")) {
                 i.removeAttribute("value");
             }
             modalInputReplyDate.closest("div").style.visibility = "hidden";
+            modal.querySelector("input[name='replyer']").value = replyer;
             modal.querySelector("button[id='modalModBtn']").style.visibility = "hidden";
             modal.querySelector("button[id='modalRemoveBtn']").style.visibility = "hidden";
             modalRegisterBtn.style.visibility = "visible";
         });
 
-        const modalRegisterBtn = document.querySelector("#modalRegisterBtn");
-        modalRegisterBtn.addEventListener("click", function (e) {
-            const reply = {
-                reply: modalInputReply.value,
-                replyer: modalInputReplyer.value,
-                bno: bnoValue
-            }
-            replyService.add(reply, (result) => {
-                modal.querySelector("input[name='reply']").value = "";
-                modal.querySelector("input[name='replyer']").value = "";
+        $(document).ajaxSend(function(e, xhr, options){
+            xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
+		});
 
-                // showList(1);
-                showList(-1);
-            });
-        });
-
+        // 모달 댓글 등록
         replyUL.addEventListener("click", function (e) {
             const target = e.target.closest("li");
             if (target.tagName == "LI") {
@@ -424,9 +432,43 @@
             });
         });
 
+        const modalRegisterBtn = document.querySelector("#modalRegisterBtn");
+        modalRegisterBtn.addEventListener("click", function (e) {
+            const reply = {
+                reply: modalInputReply.value,
+                replyer: modalInputReplyer.value,
+                bno: bnoValue
+            }
+            replyService.add(reply, (result) => {
+                modal.querySelector("input[name='reply']").value = "";
+                modal.querySelector("input[name='replyer']").value = "";
+
+                // showList(1);
+                showList(-1);
+            });
+        });
+
         // 모달 댓글 수정
         modalModBtn.addEventListener("click", function (e) {
-            const reply = {rno: modal.dataset.rno, reply: modalInputReply.value};
+            const originalReplyer = modalInputReplyer.value;
+            const reply = {
+                rno: modal.dataset.rno,
+				reply: modalInputReply.value,
+				replyer: originalReplyer
+            };
+
+            if(!replyer){
+                alert("로그인 후 수정이 가능합니다.")
+                $(".modal").modal("hide");
+                return;
+            }
+
+            if(replyer != originalReplyer){
+                alert("자신이 작성한 댓글만 수정이 가능합니다.")
+                $(".modal").modal("hide");
+                return;
+            }
+
             replyService.update(reply, (result) => {
                 $(".modal").modal("hide");
                 showList(replyPageNum);
@@ -436,7 +478,23 @@
         // 모달 댓글 삭제
         modalRemoveBtn.addEventListener("click", function (e) {
             const rno = modal.dataset.rno;
-            replyService.remove(rno, (result) => {
+
+            if(!replyer) {
+				alert("로그인 후 삭제가 가능합니다.");
+                $(".modal").modal("hide");
+                return;
+			}
+
+            const originalReplyer = modalInputReplyer.value;
+
+            if(replyer != originalReplyer){
+                alert("자신이 작성한 댓글만 삭제가 가능합니다.");
+                $(".modal").modal("hide");
+                return;
+			}
+
+            replyService.remove(rno, originalReplyer, (result) => {
+                alert(result);
                 $(".modal").modal("hide");
                 showList(replyPageNum);
             });

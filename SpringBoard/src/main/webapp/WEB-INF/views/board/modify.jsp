@@ -2,6 +2,7 @@
 		 pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <%@ include file="../includes/header.jsp" %>
 
@@ -23,6 +24,7 @@
 			<!-- /.panel-heading -->
 			<div class="panel-body">
 				<form role="form" action="/board/modify" method="post">
+					<input type="hidden" name="_csrf.parameterName" value="_csrf.token" />
 
 					<input type="hidden" name="pageNum" value="<c:out value='${cri.pageNum}'/>">
 					<input type="hidden" name="amount" value="<c:out value='${cri.amount}'/>">
@@ -63,8 +65,15 @@
 							   readonly="readonly">
 					</div>
 
-					<button type="submit" data-oper="modify" class="btn btn-default">Modify</button>
-					<button type="submit" data-oper="remove" class="btn btn-danger">Remove</button>
+					<sec:authentication property="principal" var="pinfo">
+						<sec:authorize access="isAuthenticated()">
+							<c:if test="${pinfo.username eq board.writer}">
+								<button type="submit" data-oper="modify" class="btn btn-default">Modify</button>
+								<button type="submit" data-oper="remove" class="btn btn-danger">Remove</button>
+							</c:if>
+						</sec:authorize>
+					</sec:authentication>
+
 					<button type="submit" data-oper="list" class="btn btn-info">List</button>
 				</form>
 			</div>
@@ -310,6 +319,9 @@
 
         const fileChange = document.querySelector("input[type='file']");
         fileChange.addEventListener("change", (e) => {
+            const csrfHeaderName = "${_csrf.headerName}";
+            const csrfTokenValue = "${_csrf.token}";
+
             const formData = new FormData();
 
             const inputFile = document.querySelector("input[name='uploadFile']");
@@ -323,18 +335,34 @@
                 formData.append("uploadFile", files[i]);
             }
 
-            fetch("/uploadAjaxAction", {
-                method: "POST",
-                body: formData
-            })
-                .then((response) => response.json())
-                .then(commits => {
-                    console.log(commits);
-                    showUploadResult(commits);
-                })
-                .catch((error) => {
-                    alert(error)
-                });
+            $.ajax({
+                url: "/uploadAjaxAction",
+				processData: false,
+				contentType: false,
+                type: 'POST',
+                data: formData,
+                beforeSend: function (xhr){
+                    xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
+                },
+                dataType: 'json',
+                success: function (result){
+                    console.log(result);
+                    showUploadResult(result);
+                }
+            });
+
+            // fetch("/uploadAjaxAction", {
+            //     method: "POST",
+            //     body: formData
+            // })
+			// .then((response) => response.json())
+			// .then(commits => {
+			// 	console.log(commits);
+			// 	showUploadResult(commits);
+			// })
+			// .catch((error) => {
+			// 	alert(error)
+			// });
         });
     });
 </script>

@@ -36,9 +36,10 @@ const replyService = (() => {
     }
     
     // 댓글 삭제
-    const remove = (rno, callback, error) => {
+    const remove = (rno, replyer, callback, error) => {
         const xhrRemove = new XMLHttpRequest();
         xhrRemove.open("DELETE", `/replies/${rno}`, true);
+        xhrRemove.setRequestHeader('content-type', 'application/json; charset=utf-8');
         xhrRemove.onload = function () {
             if (this.status == 200 && this.readyState == this.DONE) {
                 callback(this.response);
@@ -46,7 +47,8 @@ const replyService = (() => {
                 error(this.response);
             }
         };
-        xhrRemove.send(null);
+        const data = JSON.stringify({rno: rno, replyer: replyer});
+        xhrRemove.send(data);
     }
 
     // 댓글 수정
