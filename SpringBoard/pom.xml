@@ -13,7 +13,7 @@
 		<org.springframework-version>5.2.22.RELEASE</org.springframework-version>
 		<org.aspectj-version>1.9.9.1</org.aspectj-version>
 		<org.slf4j-version>1.7.5</org.slf4j-version>
-		<org.log4j-version>2.9.0</org.log4j-version>
+		<org.log4j-version>2.17.1</org.log4j-version>
 	</properties>
 
 	<dependencies>
